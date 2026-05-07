@@ -75,7 +75,8 @@ def summary() -> dict:
 if FRONTEND_DIR.exists():
     app.mount("/css", StaticFiles(directory=FRONTEND_DIR / "css"), name="css")
     app.mount("/js", StaticFiles(directory=FRONTEND_DIR / "js"), name="js")
-    app.mount("/assets", StaticFiles(directory=FRONTEND_DIR / "assets"), name="assets")
+    if (FRONTEND_DIR / "assets").is_dir():
+        app.mount("/assets", StaticFiles(directory=FRONTEND_DIR / "assets"), name="assets")
 
     @app.get("/")
     def index() -> FileResponse:

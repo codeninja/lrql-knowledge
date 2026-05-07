@@ -127,6 +127,10 @@ export function createGraph(container) {
 
     if (layoutMode === "radial" && currentData.kind === "describe") {
       applyRadialLayout(nodes, currentData.entity);
+    } else {
+      // Seed positions near the centre so fit() works before the simulation
+      // ticks, and so we never explode out of the viewBox on first render.
+      seedPositions(nodes);
     }
 
     const link = linkLayer
@@ -236,6 +240,24 @@ export function createGraph(container) {
     const mx = (d.source.x + d.target.x) / 2 - dy * (curve / dist);
     const my = (d.source.y + d.target.y) / 2 + dx * (curve / dist);
     return `M${d.source.x},${d.source.y} Q${mx},${my} ${d.target.x},${d.target.y}`;
+  }
+
+  function seedPositions(nodes) {
+    if (!nodes.length) return;
+    // Use live dimensions so seeding survives layout changes between
+    // createGraph() and the first setData(); fall back to current width/height.
+    const w = container.clientWidth || width;
+    const h = container.clientHeight || height;
+    const cx = w / 2;
+    const cy = h / 2;
+    const r = Math.min(w, h) * 0.18;
+    nodes.forEach((n, i) => {
+      if (typeof n.x !== "number" || typeof n.y !== "number") {
+        const a = (i / nodes.length) * Math.PI * 2;
+        n.x = cx + Math.cos(a) * r;
+        n.y = cy + Math.sin(a) * r;
+      }
+    });
   }
 
   function applyRadialLayout(nodes, rootId) {
