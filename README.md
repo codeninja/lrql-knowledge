@@ -7,6 +7,38 @@ This explorer lets you browse the relations encoded inside a vindex with a polis
 ![architecture](https://img.shields.io/badge/stack-FastAPI%20%2B%20D3-5cf2ff?style=flat-square)
 ![status](https://img.shields.io/badge/status-iterating-c47bff?style=flat-square)
 
+![DESCRIBE "France" against gemma3-4b-it.vindex](docs/screenshots/real-01-describe-france.png)
+
+## Screenshots
+
+### Mock backend
+
+The bundled mock vindex (geography, science, transformer models, medicine) lets the explorer run with zero external dependencies. `./run.sh` and you're live.
+
+| | |
+|---|---|
+| `DESCRIBE "France"` — auto-loaded on first launch | `WALK "The capital of France is" TOP 10` |
+| ![DESCRIBE France](docs/screenshots/mock-01-describe-france.png) | ![WALK trail](docs/screenshots/mock-03-walk-trail.png) |
+| Inspector panel (click a node) | `INFER "The capital of Germany is" TOP 5` |
+| ![Inspector France](docs/screenshots/mock-02-inspector-france.png) | ![INFER predictions](docs/screenshots/mock-04-infer-predictions.png) |
+| `INSERT INTO EDGES (...)` then `DESCRIBE "aspirin"` round-trip | `DESCRIBE "transformer"` (Mistral / Llama / Gemma cluster) |
+| ![Insert then describe](docs/screenshots/mock-05-insert-then-describe.png) | ![DESCRIBE transformer](docs/screenshots/mock-06-describe-transformer.png) |
+| LQL cheatsheet | |
+| ![Help cheatsheet](docs/screenshots/mock-07-help-cheatsheet.png) | |
+
+### Real LARQL backend
+
+The same flows against `gemma3-4b-it.vindex` via the real `larql` Rust binary. Edges are parsed live from the model's weight-derived knowledge — no preloaded graph file.
+
+| | |
+|---|---|
+| `DESCRIBE "France"` — 18 edges parsed across Syntax / Edges / Output | **`INFER "The capital of France is"` → Paris (80.64%)** |
+| ![DESCRIBE France real](docs/screenshots/real-01-describe-france.png) | ![INFER Paris real](docs/screenshots/real-02-infer-paris.png) |
+| `WALK "The capital of France is" TOP 10` — per-layer trail | `INSERT INTO EDGES (caffeine, treats, drowsiness)` — installed at L26 |
+| ![WALK real](docs/screenshots/real-03-walk-trail.png) | ![INSERT real](docs/screenshots/real-04-insert-real.png) |
+| `DESCRIBE "Albert Einstein"` cluster | |
+| ![DESCRIBE Einstein real](docs/screenshots/real-05-describe-einstein.png) | |
+
 ## Highlights
 
 - **D3 force-directed graph** with neon node halos, gradient trail edges for `WALK`, animated dash-flow, hover tooltips, drag-to-pin, pan/zoom, fit-to-view, SVG export.
