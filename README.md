@@ -18,7 +18,7 @@ This explorer lets you browse the relations encoded inside a vindex with a polis
 
 ## Running
 
-### Mock mode (zero dependencies beyond Python)
+### Mock mode (zero dependencies beyond `uv`)
 
 ```bash
 ./run.sh
@@ -38,15 +38,20 @@ LARQL_VINDEX=./gemma-3-4b-it-vindex \
 ./run.sh
 ```
 
-The backend wrapper (`backend/lrql_client.py`) shells out to:
+The backend wrapper (`backend/lrql_client.py`) forwards every statement through
+`larql lql` (the universal LQL entry point) with a `USE` preamble each call,
+then parses the text output:
 
-| LQL                                          | CLI invocation                                        |
-| -------------------------------------------- | ----------------------------------------------------- |
-| `DESCRIBE "France"`                          | `larql describe <vindex> France --format json`        |
-| `WALK "The capital of France is" TOP 10`     | `larql walk <vindex> "..." --top 10 --format json`    |
-| `INFER "The capital of France is" TOP 3`     | `larql run <vindex> "..." --top 3 --format json`      |
+| LQL                                          | CLI invocation                                                            |
+| -------------------------------------------- | ------------------------------------------------------------------------- |
+| `DESCRIBE "France"`                          | `larql lql 'USE "<vindex>"; DESCRIBE "France";'`                          |
+| `WALK "The capital of France is" TOP 10`     | `larql lql 'USE "<vindex>"; WALK "..." TOP 10;'`                          |
+| `INFER "The capital of France is" TOP 3`     | `larql lql 'USE "<vindex>"; INFER "..." TOP 3;'`                          |
+| `INSERT INTO EDGES (...) VALUES (...)`       | `larql lql 'USE "<vindex>"; INSERT INTO EDGES ... VALUES (...);'`          |
 
-(`INSERT` is parsed but the CLI flow for patches is left for a future iteration.)
+The wrapper handles both the inference-capable INFER format
+(`1. Paris (97.91%)`) and the per-layer feature dump that browse-only vindexes
+fall back to.
 
 ## Try these
 

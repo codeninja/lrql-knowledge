@@ -8,18 +8,16 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-PYTHON=${PYTHON:-python3}
 PORT=${PORT:-8000}
 HOST=${HOST:-127.0.0.1}
 
-if [ ! -d ".venv" ]; then
-  echo "→ creating virtualenv"
-  "$PYTHON" -m venv .venv
+if ! command -v uv >/dev/null 2>&1; then
+  echo "→ uv is required. Install from https://docs.astral.sh/uv/" >&2
+  exit 1
 fi
-# shellcheck disable=SC1091
-source .venv/bin/activate
-pip install --quiet --upgrade pip
-pip install --quiet -r requirements.txt
+
+echo "→ syncing dependencies"
+uv sync --quiet
 
 echo "→ launching on http://$HOST:$PORT"
-exec uvicorn backend.server:app --host "$HOST" --port "$PORT" --reload
+exec uv run uvicorn backend.server:app --host "$HOST" --port "$PORT" --reload
