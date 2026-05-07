@@ -11,22 +11,7 @@ This explorer lets you browse the relations encoded inside a vindex with a polis
 
 ## Screenshots
 
-### Mock backend
-
-The bundled mock vindex (geography, science, transformer models, medicine) lets the explorer run with zero external dependencies. `./run.sh` and you're live.
-
-| | |
-|---|---|
-| `DESCRIBE "France"` — auto-loaded on first launch | `WALK "The capital of France is" TOP 10` |
-| ![DESCRIBE France](docs/screenshots/mock-01-describe-france.png) | ![WALK trail](docs/screenshots/mock-03-walk-trail.png) |
-| Inspector panel (click a node) | `INFER "The capital of Germany is" TOP 5` |
-| ![Inspector France](docs/screenshots/mock-02-inspector-france.png) | ![INFER predictions](docs/screenshots/mock-04-infer-predictions.png) |
-| `INSERT INTO EDGES (...)` then `DESCRIBE "aspirin"` round-trip | `DESCRIBE "transformer"` (Mistral / Llama / Gemma cluster) |
-| ![Insert then describe](docs/screenshots/mock-05-insert-then-describe.png) | ![DESCRIBE transformer](docs/screenshots/mock-06-describe-transformer.png) |
-| LQL cheatsheet | |
-| ![Help cheatsheet](docs/screenshots/mock-07-help-cheatsheet.png) | |
-
-### Real LARQL backend
+### LARQL backend
 
 The same flows against `gemma3-4b-it.vindex` via the real `larql` Rust binary. Edges are parsed live from the model's weight-derived knowledge — no preloaded graph file.
 
