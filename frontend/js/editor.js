@@ -14,6 +14,7 @@ export function createEditor(el, { onRun }) {
   el.addEventListener("keydown", (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
       e.preventDefault();
+      e.stopPropagation();
       onRun(el.innerText);
     }
     // Tab inserts spaces instead of leaving the editor
