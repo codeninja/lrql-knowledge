@@ -412,21 +412,38 @@ function normalize(data) {
 }
 
 function drag(simulation) {
+  // `moved` lets us distinguish a real drag from a bare click — the d3
+  // drag behaviour fires `start` and `end` on every mousedown/mouseup
+  // pair, so reheating the simulation in `start` would shake the whole
+  // graph every time the user clicks a node. We only reheat once the
+  // first `drag` event arrives, and we leave the node pinned at its
+  // dropped position so manual rearrangements stick.
+  let moved = false;
   return d3
     .drag()
     .on("start", (event, d) => {
-      if (!event.active) simulation.alphaTarget(0.3).restart();
+      moved = false;
       d.fx = d.x;
       d.fy = d.y;
     })
     .on("drag", (event, d) => {
+      if (!moved) {
+        moved = true;
+        if (!event.active) simulation.alphaTarget(0.1).restart();
+      }
       d.fx = event.x;
       d.fy = event.y;
     })
     .on("end", (event, d) => {
-      if (!event.active) simulation.alphaTarget(0);
-      d.fx = null;
-      d.fy = null;
+      if (moved) {
+        if (!event.active) simulation.alphaTarget(0);
+        // keep d.fx / d.fy where the user dropped the node so the
+        // layout doesn't snap back when forces resume
+      } else {
+        // unmoved click — release the temporary pin set in `start`
+        d.fx = null;
+        d.fy = null;
+      }
     });
 }
 
