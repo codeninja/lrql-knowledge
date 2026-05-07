@@ -1,0 +1,130 @@
+/* ==========================================================================
+   GRAPH · SVG node/edge styling
+   ========================================================================== */
+
+.canvas svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+}
+.canvas svg.is-panning { cursor: grabbing; }
+
+.graph-link {
+  fill: none;
+  stroke: rgba(154, 160, 200, 0.35);
+  stroke-width: 1.2;
+  transition: stroke var(--t-base) var(--ease-out), stroke-width var(--t-base) var(--ease-out);
+}
+.graph-link--strong { stroke: rgba(154, 160, 200, 0.55); }
+.graph-link--trail {
+  stroke: url(#trail-gradient);
+  stroke-width: 2.4;
+  filter: drop-shadow(0 0 6px rgba(92, 242, 255, 0.55));
+}
+.graph-link--dim { stroke-opacity: 0.18; }
+
+.graph-link--flow {
+  stroke-dasharray: 6 8;
+  animation: dash 1.4s linear infinite;
+}
+@keyframes dash {
+  to { stroke-dashoffset: -28; }
+}
+
+.graph-rel-label {
+  fill: var(--text-mute);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  paint-order: stroke;
+  stroke: rgba(5, 8, 22, 0.85);
+  stroke-width: 3px;
+  pointer-events: none;
+  letter-spacing: 0.04em;
+}
+.graph-rel-label--trail { fill: var(--cyan); }
+
+.graph-node {
+  cursor: pointer;
+}
+
+.graph-node__halo {
+  fill: currentColor;
+  opacity: 0.18;
+  filter: blur(6px);
+  transition: opacity var(--t-base) var(--ease-out), r var(--t-base) var(--ease-out);
+}
+
+.graph-node__core {
+  fill: var(--bg-1);
+  stroke: currentColor;
+  stroke-width: 2;
+  transition: stroke-width var(--t-base) var(--ease-out), filter var(--t-base) var(--ease-out);
+}
+
+.graph-node--root .graph-node__core {
+  fill: currentColor;
+  filter: drop-shadow(0 0 18px currentColor);
+}
+.graph-node--root .graph-node__halo { opacity: 0.32; }
+
+.graph-node--hover .graph-node__halo,
+.graph-node--selected .graph-node__halo { opacity: 0.4; }
+.graph-node--selected .graph-node__core {
+  stroke-width: 3;
+  filter: drop-shadow(0 0 14px currentColor);
+}
+
+.graph-node--trail .graph-node__core {
+  fill: currentColor;
+}
+.graph-node--trail .graph-node__halo { opacity: 0.4; }
+
+.graph-node--dim .graph-node__core,
+.graph-node--dim .graph-node__halo { opacity: 0.25; }
+
+.graph-node__label {
+  fill: var(--text);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 500;
+  text-anchor: middle;
+  dominant-baseline: hanging;
+  paint-order: stroke;
+  stroke: rgba(5, 8, 22, 0.85);
+  stroke-width: 3px;
+  pointer-events: none;
+}
+.graph-node--root .graph-node__label {
+  font-weight: 600;
+  fill: var(--text);
+}
+
+/* Pulse animation for trail nodes */
+.graph-node--trail .graph-node__halo { animation: nodePulse 2.4s ease-in-out infinite; }
+@keyframes nodePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+}
+
+/* Tooltip ----------------------------------------------------------------- */
+
+.graph-tooltip {
+  position: absolute;
+  pointer-events: none;
+  padding: 8px 10px;
+  border-radius: var(--r-md);
+  background: rgba(5, 8, 22, 0.92);
+  border: 1px solid var(--hairline-strong);
+  box-shadow: var(--shadow-card);
+  font-size: 11.5px;
+  color: var(--text);
+  transform: translate(-50%, calc(-100% - 12px));
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity var(--t-fast) var(--ease-out);
+  font-family: var(--font-mono);
+}
+.graph-tooltip.is-visible { opacity: 1; }
+.graph-tooltip .label { color: var(--cyan); }
+.graph-tooltip .meta { color: var(--text-mute); margin-left: 8px; }
