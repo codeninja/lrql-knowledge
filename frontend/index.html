@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LRQL Explorer · The model is the database</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/theme.css" />
+    <link rel="stylesheet" href="/css/layout.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/graph.css" />
+    <script src="https://d3js.org/d3.v7.min.js" defer></script>
+    <script type="module" src="/js/main.js" defer></script>
+  </head>
+  <body>
+    <div class="aurora" aria-hidden="true">
+      <span class="aurora__blob aurora__blob--cyan"></span>
+      <span class="aurora__blob aurora__blob--magenta"></span>
+      <span class="aurora__blob aurora__blob--violet"></span>
+    </div>
+    <div class="grid-bg" aria-hidden="true"></div>
+
+    <header class="topbar glass">
+      <div class="brand">
+        <div class="brand__logo" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none">
+            <defs>
+              <linearGradient id="lg" x1="0" y1="0" x2="32" y2="32">
+                <stop offset="0%" stop-color="#5cf2ff" />
+                <stop offset="100%" stop-color="#c47bff" />
+              </linearGradient>
+            </defs>
+            <circle cx="16" cy="16" r="13" stroke="url(#lg)" stroke-width="1.5" />
+            <circle cx="16" cy="16" r="4" fill="url(#lg)" />
+            <circle cx="6" cy="9" r="2" fill="#5cf2ff" />
+            <circle cx="26" cy="11" r="2" fill="#c47bff" />
+            <circle cx="22" cy="25" r="2" fill="#9affd1" />
+            <line x1="16" y1="16" x2="6" y2="9" stroke="url(#lg)" stroke-width="1" />
+            <line x1="16" y1="16" x2="26" y2="11" stroke="url(#lg)" stroke-width="1" />
+            <line x1="16" y1="16" x2="22" y2="25" stroke="url(#lg)" stroke-width="1" />
+          </svg>
+        </div>
+        <div class="brand__text">
+          <span class="brand__name">LRQL<span class="brand__accent">·</span>Explorer</span>
+          <span class="brand__tag">the model is the database</span>
+        </div>
+      </div>
+
+      <div class="vindex-pill" id="vindex-pill" title="Active vindex">
+        <span class="dot"></span>
+        <span class="vindex-pill__name" id="vindex-name">mock://gemma-3-4b-it-vindex</span>
+        <span class="vindex-pill__stats" id="vindex-stats">— · —</span>
+      </div>
+
+      <div class="topbar__actions">
+        <button class="btn btn-ghost" data-action="show-help">
+          <span class="kbd">?</span> help
+        </button>
+        <button class="btn btn-primary" data-action="run">
+          <span>RUN</span>
+          <span class="kbd">⌘↵</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <!-- Left rail: entity browser -->
+      <aside class="rail rail--left glass" id="rail-left">
+        <div class="rail__head">
+          <div class="rail__title">
+            <span class="rail__title-text">Entities</span>
+            <span class="rail__title-count" id="entity-count">0</span>
+          </div>
+          <div class="searchbox">
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <circle cx="7" cy="7" r="5" stroke="currentColor" fill="none" stroke-width="1.5" />
+              <line x1="11" y1="11" x2="14" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+            <input
+              id="entity-search"
+              type="search"
+              placeholder="search entities…"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+        </div>
+
+        <div class="filter-chips" id="kind-filters"></div>
+        <ul class="entity-list" id="entity-list"></ul>
+
+        <div class="rail__section">
+          <div class="rail__section-title">Quick prompts</div>
+          <div class="suggest-list" id="suggest-list"></div>
+        </div>
+      </aside>
+
+      <!-- Center: editor + canvas -->
+      <section class="center">
+        <div class="editor glass" id="editor">
+          <div class="editor__head">
+            <div class="editor__tabs">
+              <button class="tab tab--active" data-tab="lql">LQL</button>
+              <button class="tab" data-tab="history">History</button>
+            </div>
+            <div class="editor__hint">
+              <span class="kbd">⌘↵</span> run · <span class="kbd">⌘K</span> palette
+            </div>
+          </div>
+
+          <div class="editor__panels">
+            <div class="editor__panel" data-panel="lql">
+              <div class="editor__gutter"><span>1</span></div>
+              <div
+                id="lql-input"
+                class="editor__input"
+                contenteditable="true"
+                spellcheck="false"
+                data-placeholder="DESCRIBE &quot;France&quot;;"
+              ></div>
+            </div>
+            <div class="editor__panel hidden" data-panel="history">
+              <ul class="history-list" id="history-list"></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="canvas-shell glass">
+          <div class="canvas-toolbar">
+            <div class="canvas-toolbar__title" id="canvas-title">Knowledge graph</div>
+            <div class="canvas-toolbar__group">
+              <button class="iconbtn" data-action="layout-force" title="Force layout"><span>◉</span></button>
+              <button class="iconbtn" data-action="layout-radial" title="Radial layout"><span>✦</span></button>
+              <button class="iconbtn" data-action="zoom-in" title="Zoom in"><span>+</span></button>
+              <button class="iconbtn" data-action="zoom-out" title="Zoom out"><span>−</span></button>
+              <button class="iconbtn" data-action="zoom-fit" title="Fit"><span>⤢</span></button>
+              <button class="iconbtn" data-action="export-svg" title="Export SVG"><span>↧</span></button>
+            </div>
+          </div>
+          <div class="canvas" id="canvas"></div>
+          <div class="canvas-overlay">
+            <div class="legend" id="legend"></div>
+            <div class="walk-player" id="walk-player" hidden>
+              <button class="iconbtn iconbtn--lg" data-action="walk-prev" title="Prev">◀</button>
+              <button class="iconbtn iconbtn--lg" data-action="walk-play" id="walk-play" title="Play">▶</button>
+              <button class="iconbtn iconbtn--lg" data-action="walk-next" title="Next">▶</button>
+              <div class="walk-trail" id="walk-trail"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right rail: inspector / results -->
+      <aside class="rail rail--right glass" id="rail-right">
+        <div class="rail__tabs">
+          <button class="tab tab--active" data-rtab="inspector">Inspector</button>
+          <button class="tab" data-rtab="results">Result</button>
+          <button class="tab" data-rtab="patch">Patch</button>
+        </div>
+
+        <div class="rail__pane" data-rpane="inspector">
+          <div class="inspector-empty" id="inspector-empty">
+            <div class="halo"></div>
+            <p>Click a node to inspect.</p>
+            <p class="hint">Or run <code>DESCRIBE &quot;France&quot;</code>.</p>
+          </div>
+          <div class="inspector" id="inspector" hidden>
+            <header class="inspector__head">
+              <span class="kind-chip" id="ins-kind">concept</span>
+              <h2 id="ins-label">—</h2>
+            </header>
+            <div class="inspector__row">
+              <div class="kv"><span>degree</span><b id="ins-degree">0</b></div>
+              <div class="kv"><span>kind</span><b id="ins-kind-text">—</b></div>
+            </div>
+            <h3>Outgoing</h3>
+            <ul class="edge-list" id="ins-out"></ul>
+            <h3>Incoming</h3>
+            <ul class="edge-list" id="ins-in"></ul>
+            <div class="inspector__actions">
+              <button class="btn btn-ghost" data-action="describe-current">DESCRIBE</button>
+              <button class="btn btn-ghost" data-action="walk-current">WALK from here</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="rail__pane hidden" data-rpane="results">
+          <pre class="result-json" id="result-json">// run a query to see the raw result</pre>
+        </div>
+
+        <div class="rail__pane hidden" data-rpane="patch">
+          <form class="patch-form" id="patch-form">
+            <label>entity<input name="entity" placeholder="John Coyle" required /></label>
+            <label>relation<input name="relation" placeholder="lives-in" required /></label>
+            <label>target<input name="target" placeholder="Colchester" required /></label>
+            <button type="submit" class="btn btn-primary">INSERT INTO EDGES</button>
+          </form>
+          <p class="patch-hint">
+            Patches are appended to the active vindex. With a real backend, wrap inserts in
+            <code>BEGIN PATCH</code> / <code>SAVE PATCH</code>.
+          </p>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="statusbar glass">
+      <div class="statusbar__left">
+        <span class="status-dot status-dot--ok" id="status-dot"></span>
+        <span id="status-text">ready</span>
+      </div>
+      <div class="statusbar__right">
+        <span id="backend-badge" class="badge">backend: mock</span>
+        <span id="latency-badge" class="badge">— ms</span>
+      </div>
+    </footer>
+
+    <!-- Help / palette -->
+    <div class="modal" id="help-modal" hidden>
+      <div class="modal__panel glass">
+        <header>
+          <h2>LQL · cheatsheet</h2>
+          <button class="iconbtn" data-action="close-help">✕</button>
+        </header>
+        <div class="cheats">
+          <div class="cheat">
+            <code>USE "gemma-3-4b-it.vindex";</code>
+            <p>Switch to a different vindex.</p>
+          </div>
+          <div class="cheat">
+            <code>DESCRIBE "France";</code>
+            <p>Return all relations attached to an entity.</p>
+          </div>
+          <div class="cheat">
+            <code>WALK "The capital of France is" TOP 10;</code>
+            <p>Trace the strongest path through gate vectors.</p>
+          </div>
+          <div class="cheat">
+            <code>INFER "The capital of France is" TOP 3;</code>
+            <p>Top-k next-token predictions with probabilities.</p>
+          </div>
+          <div class="cheat">
+            <code>INSERT INTO EDGES (entity, relation, target) VALUES ("aspirin", "treats", "headache");</code>
+            <p>Append knowledge to the active patch.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <template id="entity-row-tpl">
+      <li class="entity-row">
+        <span class="kind-chip"></span>
+        <span class="entity-row__label"></span>
+        <span class="entity-row__deg"></span>
+      </li>
+    </template>
+
+    <template id="edge-row-tpl">
+      <li class="edge-row">
+        <span class="edge-row__rel"></span>
+        <span class="edge-row__target"></span>
+        <span class="edge-row__weight"></span>
+      </li>
+    </template>
+  </body>
+</html>

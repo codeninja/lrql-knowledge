@@ -1,0 +1,32 @@
+[project]
+name = "lrql-knowledge"
+version = "0.1.0"
+description = "Futuristic graph explorer for LRQL/LARQL — browse a vindex as a knowledge graph."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "fastapi==0.115.0",
+    "uvicorn[standard]==0.30.6",
+    "pydantic==2.9.2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "httpx>=0.27",
+    "ruff>=0.6",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+filterwarnings = ["ignore::DeprecationWarning"]
