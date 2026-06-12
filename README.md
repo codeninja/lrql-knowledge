@@ -1,6 +1,6 @@
 # lrql-knowledge
 
-A futuristic, neo4j-browser-style **knowledge graph explorer** for [LRQL/LARQL](https://github.com/chrishayuk/larql) — Chris Hayuk's project that treats neural-network weights as a queryable database (the model *is* the database).
+A futuristic, neo4j-browser-style **knowledge graph explorer** for [LARQL](https://github.com/chrishayuk/larql) — Chris Hayuk's project that treats neural-network weights as a queryable database (the model *is* the database).
 
 This explorer lets you browse the relations encoded inside a vindex with a polished web UI. It speaks **LQL** (`USE` / `DESCRIBE` / `WALK` / `INFER` / `INSERT INTO EDGES`) and visualises results as an interactive force-directed graph.
 
